@@ -12,12 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 02563fd1c0101bc42826022bc9d11a33, type: 3}
   m_Name: AudioPalette_Default
   m_EditorClassIdentifier: 
-  bgmIntro: {fileID: 0}
-  bgmStartScene: {fileID: 0}
-  bgmGhostsNormal: {fileID: 0}
-  bgmGhostsScared: {fileID: 0}
-  bgmGhostsDead: {fileID: 0}
-  sfxMoveNoPellet: {fileID: 0}
-  sfxEatPellet: {fileID: 0}
-  sfxHitWall: {fileID: 0}
-  sfxDeath: {fileID: 0}
+  bgmIntro: {fileID: 8300000, guid: c9880850dd3f9384bb5f749df4d70613, type: 3}
+  bgmStartScene: {fileID: 8300000, guid: a903083ea2f465748be958eeb497ef22, type: 3}
+  bgmGhostsNormal: {fileID: 8300000, guid: fc9086c6e53443842b0a178449e01221, type: 3}
+  bgmGhostsScared: {fileID: 8300000, guid: cb9fc531da47adc4db35cc0b02f2e837, type: 3}
+  bgmGhostsDead: {fileID: 8300000, guid: fdaaad7b457f3f243b7d05b92375bacb, type: 3}
+  sfxMoveNoPellet: {fileID: 8300000, guid: 1b3ffe3a78085aa49838122d2c6e45dd, type: 3}
+  sfxEatPellet: {fileID: 8300000, guid: 2157abe2c8665c44282ad6bd850e19e6, type: 3}
+  sfxHitWall: {fileID: 8300000, guid: 717b5ee0486998c4392b532eebfbdeb8, type: 3}
+  sfxDeath: {fileID: 8300000, guid: bd3c2fb34910e6649a8cb1edcf556c92, type: 3}

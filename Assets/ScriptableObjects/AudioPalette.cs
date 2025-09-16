@@ -1,17 +1,17 @@
-// Assets/Scripts/Audio/AudioPalette.cs
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
-
 [CreateAssetMenu(menuName = "PacStudent/Audio Palette", fileName = "AudioPalette")]
 public class AudioPalette : ScriptableObject
 {
-    [Header("BGM")]
+  
     public AudioClip bgmIntro;
     public AudioClip bgmStartScene;
     public AudioClip bgmGhostsNormal;
     public AudioClip bgmGhostsScared;
     public AudioClip bgmGhostsDead;
 
-    [Header("SFX")]
+  
     public AudioClip sfxMoveNoPellet;
     public AudioClip sfxEatPellet;
     public AudioClip sfxHitWall;
