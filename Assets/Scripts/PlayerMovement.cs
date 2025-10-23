@@ -2,38 +2,43 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement; // 保留：用于获取当前场景名称，区分两个场景的最高分
+
 public class PlayerMovement : MonoBehaviour
 {
     public GameObject winObject;
+    public GameObject daojishi;
     public bool allowDiagonalMovement = false;
-   
+
     public float moveSpeed = 5f;
     public float directionChangeDelay = 0.1f;
-    
+
     public string pelletTag = "Pellet";
     public string wallTag = "Wall";
     public string powerPelletTag = "PowerPellet";
     public string enemyTag = "Enemy";
-   
+
     public int powerPelletScore = 10;
-    public Text scoreText;
-    
+    public Text scoreText; 
+
     public ChildActivationManager childManager;
 
 
     private Rigidbody2D rb;
     private Animator animator;
     private bool isOnPellet = false;
-    private Vector2 currentMoveDir = Vector2.zero;  
-    private Vector2 handleInputDir = Vector2.zero;     
-    private Vector2 nextDir = Vector2.zero;        
-    private string lastDir = "Up";                
+    private Vector2 currentMoveDir = Vector2.zero;
+    private Vector2 handleInputDir = Vector2.zero;
+    private Vector2 nextDir = Vector2.zero;
+    private string lastDir = "Up";
     private Vector2 lastPos;
     private int score = 0;
+    private int highScore; 
+    private string highScoreKey; 
 
-    
-    private float dirChangeTimer;                  
-    private bool isWaitingForAnim;                 
+
+    private float dirChangeTimer;
+    private bool isWaitingForAnim;
 
     [SerializeField] private AudioDirector audioDirector;
 
@@ -41,46 +46,48 @@ public class PlayerMovement : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
-       
+
         rb.gravityScale = 0;
         rb.constraints = RigidbodyConstraints2D.FreezeRotation;
         rb.bodyType = RigidbodyType2D.Dynamic;
         ConfigureCollider();
-        
+
         SetAnimationState("Up");
         lastPos = rb.position;
-        currentMoveDir = Vector2.up; 
+        currentMoveDir = Vector2.up;
         UpdateScoreDisplay();
-        
+
+       
+        InitHighScore();
+
         dirChangeTimer = 0;
         isWaitingForAnim = false;
     }
 
     void Update()
     {
-        if(score >= 266)
+        if (score >= 266)
         {
             winObject.gameObject.SetActive(true);
         }
-        HandleInput();         
-        UpdateDirChangeDelay(); 
+        HandleInput();
+        UpdateDirChangeDelay();
     }
 
     void FixedUpdate()
     {
-        HandleMovement();       
-        UpdateMovementAudio();  
+        HandleMovement();
+        UpdateMovementAudio();
     }
 
 
     private void HandleInput()
     {
-        
         if (Input.GetKeyDown(KeyCode.A))
         {
             UpdateAnimationImmediately("Left");
-            handleInputDir = Vector2.left;         
-            StartDirChangeDelay();              
+            handleInputDir = Vector2.left;
+            StartDirChangeDelay();
         }
         else if (Input.GetKeyDown(KeyCode.D))
         {
@@ -102,57 +109,52 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-   
+
     private void StartDirChangeDelay()
     {
         isWaitingForAnim = true;
-        dirChangeTimer = directionChangeDelay; 
+        dirChangeTimer = directionChangeDelay;
     }
 
-   
+
     private void UpdateDirChangeDelay()
     {
         if (!isWaitingForAnim) return;
 
-        
         dirChangeTimer -= Time.deltaTime;
         if (dirChangeTimer <= 0)
         {
-            
             nextDir = handleInputDir;
             isWaitingForAnim = false;
-            handleInputDir = Vector2.zero; 
+            handleInputDir = Vector2.zero;
         }
     }
 
-   
+
     private void HandleMovement()
     {
-        
         if (nextDir != Vector2.zero)
         {
-            
             if (CanMoveInDir(nextDir))
             {
-                currentMoveDir = nextDir; 
+                currentMoveDir = nextDir;
             }
-            nextDir = Vector2.zero; 
+            nextDir = Vector2.zero;
         }
 
-        
         if (!CanMoveInDir(currentMoveDir))
         {
             currentMoveDir = Vector2.zero;
             return;
         }
-       
+
         if (currentMoveDir != Vector2.zero)
         {
             Vector2 targetPos = rb.position + currentMoveDir * moveSpeed * Time.fixedDeltaTime;
             rb.MovePosition(targetPos);
         }
     }
- 
+
 
     private void UpdateAnimationImmediately(string dir)
     {
@@ -169,18 +171,14 @@ public class PlayerMovement : MonoBehaviour
 
         switch (dir)
         {
-            case "Up": animator.SetBool("Up", true);
-                break;
-            case "Down": animator.SetBool("Down", true);
-                break;
-            case "Left": animator.SetBool("Left", true);
-                break;
-            case "Right": animator.SetBool("Right", true);
-                break;
+            case "Up": animator.SetBool("Up", true); break;
+            case "Down": animator.SetBool("Down", true); break;
+            case "Left": animator.SetBool("Left", true); break;
+            case "Right": animator.SetBool("Right", true); break;
         }
     }
 
-    
+
     private bool CanMoveInDir(Vector2 dir)
     {
         RaycastHit2D hit = Physics2D.Raycast(rb.position, dir, 0.6f, LayerMask.GetMask("Wall"));
@@ -201,19 +199,36 @@ public class PlayerMovement : MonoBehaviour
 
         if (isMoving)
             audioDirector.PlayMoveSound(isOnPellet);
-        else 
+        else
             audioDirector.StopMoveSound();
     }
 
     private void UpdateScoreDisplay()
     {
-        scoreText.text = "Score: " + score;
+        scoreText.text = "Score: " + score.ToString("D6");
     }
 
+  
+    private void InitHighScore()
+    {
+        string currentSceneName = SceneManager.GetActiveScene().name;
+        highScoreKey = "HighScore_" + currentSceneName; 
+        highScore = PlayerPrefs.GetInt(highScoreKey, 0); 
+    }
+
+    
     public void AddScore(int points)
     {
         score += points;
         UpdateScoreDisplay();
+
+        
+        if (score > highScore)
+        {
+            highScore = score;
+            PlayerPrefs.SetInt(highScoreKey, highScore); 
+            PlayerPrefs.Save(); 
+        }
     }
 
     private void OnTriggerEnter2D(Collider2D other)
@@ -240,33 +255,32 @@ public class PlayerMovement : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D other)
     {
-       
         if (other.collider.CompareTag(wallTag))
         {
             currentMoveDir = Vector2.zero;
-            nextDir = Vector2.zero; 
-            isWaitingForAnim = false; 
+            nextDir = Vector2.zero;
+            isWaitingForAnim = false;
             audioDirector.PlayHitWallSound();
         }
-        
         else if (other.collider.CompareTag(enemyTag))
         {
-            
             Vector2 initPos = new Vector3(19, 1, 0);
             transform.position = initPos;
             rb.position = initPos;
+            if (daojishi!=null)
 
-            
+            { daojishi.SetActive(true); }
             currentMoveDir = Vector2.up;
             nextDir = Vector2.zero;
             handleInputDir = Vector2.zero;
             rb.velocity = Vector2.zero;
-            isWaitingForAnim = false; 
+            isWaitingForAnim = false;
 
             UpdateAnimationImmediately("Up");
-          
+
             childManager.DeactivateChild();
         }
     }
 
+   
 }
