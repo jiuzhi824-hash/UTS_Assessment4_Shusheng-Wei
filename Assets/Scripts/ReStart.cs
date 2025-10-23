@@ -12,12 +12,20 @@ public class ReStart : MonoBehaviour
 
     }
 
-  
+    public void OnOldReloadButtonClick()
+    {
+
+        SceneManager.LoadScene("Level");
+    }
     public void OnReloadButtonClick()
     { 
        
         SceneManager.LoadScene("Level_Recreation");
     }
 
-   
+    public void OnStartButtonClick()
+    {
+
+        SceneManager.LoadScene("StartScene");
+    }
 }
